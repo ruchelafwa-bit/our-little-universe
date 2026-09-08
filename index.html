@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description"
+        content="Our Little Universe — Sebuah kisah cinta interaktif dan kenangan indah yang dibuat khusus untukmu.">
+    <meta name="theme-color" content="#141312">
+    <title>Our Little Universe ✨</title>
+
+    <!-- Google Fonts: Editorial Serif, Modern Sans, and Warm Handwriting -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="is-locked">
+
+    <!-- Scroll progress line -->
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+    <!-- Star field canvas -->
+    <canvas id="starsCanvas" aria-hidden="true"></canvas>
+
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- ============================================================
+     00 — PRE-ENTER SCREEN (Click to Enter)
+     ============================================================ -->
+    <div class="pre-enter" id="preEnter" role="button" tabindex="0" aria-label="Click to enter">
+        <div class="pre-enter__bg" aria-hidden="true"></div>
+        <div class="pre-enter__content">
+            <p class="pre-enter__for" id="preEnterFor">untuk kamu,</p>
+            <h1 class="pre-enter__name" id="preEnterName">Karina.</h1>
+            <p class="pre-enter__sub">sebuah dunia kecil yang dibuat khusus.</p>
+            <div class="pre-enter__cta" aria-hidden="true">
+                <span class="pre-enter__cta-line"></span>
+                <span class="pre-enter__cta-text">click to enter</span>
+                <span class="pre-enter__cta-line"></span>
+            </div>
+            <p class="pre-enter__hint">✦ tap anywhere ✦</p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+     01 — THE DOOR
+     ============================================================ -->
+    <section id="door" class="door" aria-label="Opening">
+        <div class="door__content">
+            <p class="door__date" id="doorDate">September 2, 2026</p>
+
+            <div class="door__lines" id="doorLines">
+                <p class="door__line" data-order="1">Someone's birthday was a little while ago&hellip;</p>
+                <p class="door__line" data-order="2">And I was late.</p>
+                <p class="door__line" data-order="3">So I made something instead.</p>
+                <p class="door__line door__line--for" data-order="4">For you, <span id="doorName">her</span>.</p>
+            </div>
+
+            <button class="door__button" id="openButton" type="button" data-order="5">
+                <span>Open this</span>
+                <span class="door__arrow" aria-hidden="true">&rarr;</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Music controller (Always accessible, premium boutique pill) -->
+    <div class="music-player" id="musicPlayer" role="region" aria-label="Music Player">
+        <button class="music-player__toggle" id="musicToggle" type="button" aria-label="Play music"
+            aria-pressed="false">
+            <svg class="icon icon--play" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+            </svg>
+            <svg class="icon icon--pause" viewBox="0 0 24 24" aria-hidden="true" hidden>
+                <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+            </svg>
+        </button>
+        <div class="music-player__info" id="musicInfo" title="Ariana Grande, Justin Bieber — Stuck with U">
+            <span class="music-player__title" id="musicTrackName">Stuck with U</span>
+            <div class="music-player__bars" id="musicBars" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <input type="range" class="music-player__volume" id="musicVolume" min="0" max="1" step="0.01" value="0.65"
+            aria-label="Volume">
+        <button class="music-player__mute" id="musicMute" type="button" aria-label="Mute" aria-pressed="false">
+            <svg class="icon icon--unmuted" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12z" />
+            </svg>
+            <svg class="icon icon--muted" viewBox="0 0 24 24" aria-hidden="true" hidden>
+                <path
+                    d="M3 10v4h4l5 5V5L7 10H3zm14.7-1.3-1.4-1.4-2.3 2.3-2.3-2.3-1.4 1.4L12.6 11l-2.3 2.3 1.4 1.4 2.3-2.3 2.3 2.3 1.4-1.4L15.4 11z" />
+            </svg>
+        </button>
+    </div>
+    <audio id="bgMusic" loop preload="auto" src="assets/music/stuck_with_u.mp3">
+        <source src="assets/music/stuck_with_u.mp3" type="audio/mpeg">
+    </audio>
+
+    <nav class="site-nav" id="siteNav" aria-label="Chapter navigation" hidden>
+        <button class="site-nav__logo" id="secretLogo" type="button" aria-label="Our little universe">&#10022;</button>
+        <div class="site-nav__links">
+            <button class="site-nav__link is-active" data-nav="door" type="button">Home</button>
+            <button class="site-nav__link" data-nav="story" type="button">Story</button>
+            <button class="site-nav__link" data-nav="memories" type="button">Memories</button>
+            <button class="site-nav__link" data-nav="letter" type="button">Letter</button>
+        </div>
+    </nav>
+
+    <main id="main">
+
+        <section id="story" class="chapter chapter--story">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 01</p>
+                <h2 class="chapter__title">Our Story</h2>
+                <p class="chapter__subtitle">I don't remember every conversation.<br>But somehow, I remember how they
+                    made me feel.</p>
+                <div class="counter" id="relationshipCounter" aria-live="off">
+                    <p class="counter__label">Us for&hellip;</p>
+                    <div class="counter__grid" id="counterGrid"></div>
+                </div>
+            </header>
+
+            <div class="timeline" id="timeline"></div>
+        </section>
+
+        <!-- ============================================================
+       03 — HER
+       ============================================================ -->
+        <section id="her" class="chapter chapter--her">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 02</p>
+                <h2 class="chapter__title">Her.</h2>
+            </header>
+
+            <div class="her-layout">
+                <figure class="her-layout__portrait reveal">
+                    <img id="herPortrait" src="" alt="" loading="lazy">
+                </figure>
+                <div class="her-layout__floaters" id="herFloaters"></div>
+            </div>
+
+            <div class="notice reveal">
+                <p class="notice__title">Things I notice about you.</p>
+                <ul class="notice__list" id="noticeList"></ul>
+            </div>
+        </section>
+
+        <!-- ============================================================
+       04 — OUR MEMORIES
+       ============================================================ -->
+        <section id="memories" class="chapter chapter--memories">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 03</p>
+                <h2 class="chapter__title">Little Moments</h2>
+                <p class="chapter__subtitle">Some memories aren't big.<br>They just become important because they were
+                    ours.</p>
+            </header>
+
+            <div class="gallery-filters" id="galleryFilters" role="tablist" aria-label="Filter photos"></div>
+            <div class="gallery" id="gallery"></div>
+        </section>
+
+        <!-- Lightbox (used by the gallery above) -->
+        <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+            <button class="lightbox__close" id="lightboxClose" type="button" aria-label="Close">&times;</button>
+            <button class="lightbox__prev" id="lightboxPrev" type="button" aria-label="Previous photo">&lsaquo;</button>
+            <img class="lightbox__image" id="lightboxImage" src="" alt="" loading="lazy">
+            <button class="lightbox__next" id="lightboxNext" type="button" aria-label="Next photo">&rsaquo;</button>
+            <div class="lightbox__meta">
+                <p class="lightbox__caption" id="lightboxCaption"></p>
+                <p class="lightbox__counter" id="lightboxCounter"></p>
+            </div>
+        </div>
+
+        <!-- ============================================================
+       05 — ROBLOX UNIVERSE
+       ============================================================ -->
+        <section id="roblox" class="chapter chapter--roblox">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 04</p>
+                <h2 class="chapter__title">Meanwhile, in Roblox&hellip;</h2>
+            </header>
+
+            <div class="missions" id="missions"></div>
+
+            <!-- Extra roblox gallery row -->
+            <div class="roblox-gallery" id="robloxGallery"></div>
+
+            <div class="roblox-stats" id="robloxStats"></div>
+            <p class="roblox-caption" id="robloxCaption">&nbsp;</p>
+        </section>
+
+        <!-- ============================================================
+       06 — HOW WELL DO YOU KNOW US?
+       ============================================================ -->
+        <section id="quiz" class="chapter chapter--quiz">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 05</p>
+                <h2 class="chapter__title">Okay, let's see&hellip;</h2>
+                <p class="chapter__subtitle">How well do you know us?</p>
+            </header>
+
+            <div class="quiz-box" id="quizBox"></div>
+        </section>
+
+        <!-- ============================================================
+       07 — OUR LITTLE THINGS
+       ============================================================ -->
+        <section id="little-things" class="chapter chapter--notes">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 06</p>
+                <h2 class="chapter__title">The Things Only We Understand</h2>
+            </header>
+
+            <div class="notes-desk" id="notesDesk"></div>
+        </section>
+
+        <!-- ============================================================
+       08 — THE LETTER
+       ============================================================ -->
+        <section id="letter" class="chapter chapter--letter">
+            <header class="chapter__intro reveal">
+                <p class="chapter__marker">Chapter 07</p>
+                <h2 class="chapter__title">A Letter For You</h2>
+            </header>
+
+            <div class="envelope" id="envelope">
+                <div class="envelope__flap" aria-hidden="true"></div>
+                <div class="envelope__body" aria-hidden="true"></div>
+                <div class="envelope__paper-peek" aria-hidden="true"></div>
+                <button class="envelope__button" id="envelopeButton" type="button">Open</button>
+            </div>
+
+            <article class="letter-paper" id="letterPaper" hidden>
+                <div class="letter-paper__text" id="letterText"></div>
+                <p class="letter-paper__sign">&mdash; from me, to you.</p>
+            </article>
+        </section>
+
+        <!-- ============================================================
+       09 — ONE LAST THING (trigger)
+       ============================================================ -->
+        <section id="one-last-thing" class="chapter chapter--trigger">
+            <button class="reveal-button" id="revealButton" type="button" hidden>There's one more thing.</button>
+        </section>
+
+    </main>
+
+    <!-- Final surprise overlay -->
+    <div class="final-surprise" id="finalSurprise" hidden aria-hidden="true">
+        <img class="final-surprise__photo" id="finalPhoto" src="" alt="">
+        <div class="final-surprise__text" id="finalText" aria-live="polite"></div>
+    </div>
+
+    <!-- ============================================================
+     10 — TO BE CONTINUED
+     ============================================================ -->
+    <section id="ending" class="chapter chapter--ending" hidden>
+        <p class="ending__title">To Be Continued.</p>
+        <div class="ending__lines">
+            <p>Because this isn't the end of our story.</p>
+            <p>There's still more places to go.</p>
+            <p>More games to play.</p>
+            <p>More random conversations.</p>
+            <p>More memories to make.</p>
+        </div>
+        <p class="ending__cta">Let's make some more. <span aria-hidden="true">&#10084;</span></p>
+        <p class="ending__credit">Made with love, dibuat khusus dari raijel untuk asayang aku, and a lot of memories.
+        </p>
+        <button class="ending__restart" id="startAgain" type="button">Start Again</button>
+    </section>
+
+    <!-- Secret modal -->
+    <div class="secret-modal" id="secretModal" hidden role="dialog" aria-modal="true" aria-label="A secret">
+        <div class="secret-modal__card">
+            <p class="secret-modal__text" id="secretMessageText"></p>
+            <span class="secret-modal__heart" aria-hidden="true">&#10084;</span>
+            <button class="secret-modal__close" id="secretClose" type="button">Close</button>
+        </div>
+    </div>
+
+    <script src="js.js"></script>
+</body>
+
+</html>
