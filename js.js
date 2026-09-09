@@ -331,15 +331,62 @@ window.CONFIG = {
         }, { once: true });
     }
 
+    let doorSequenceStarted = false;
+    let doorTimers = [];
+
+    function startDoorSequence() {
+        if (doorSequenceStarted) return;
+        doorSequenceStarted = true;
+
+        const doorDate = document.getElementById('doorDate');
+        const lines = document.querySelectorAll('.door__line');
+        const openButton = document.getElementById('openButton');
+
+        // Step 1: Date fades in gently at 600ms
+        doorTimers.push(setTimeout(() => {
+            if (doorDate) doorDate.classList.add('is-shown');
+        }, 600));
+
+        // Step 2: Lines appear sequentially and gently
+        // Line 1: 1800ms
+        // Line 2: 4200ms
+        // Line 3: 6800ms
+        // Line 4: 9400ms
+        const lineDelays = [1800, 4200, 6800, 9400];
+        lines.forEach((line, idx) => {
+            const delay = lineDelays[idx] || (idx * 2400 + 1800);
+            doorTimers.push(setTimeout(() => {
+                line.classList.add('is-shown');
+            }, delay));
+        });
+
+        // Step 3: Button appears with subtle glow at 11800ms
+        if (openButton) {
+            doorTimers.push(setTimeout(() => {
+                openButton.classList.add('is-shown');
+            }, 11800));
+        }
+    }
+
+    function fastForwardDoor() {
+        doorTimers.forEach(t => clearTimeout(t));
+        const doorDate = document.getElementById('doorDate');
+        const lines = document.querySelectorAll('.door__line');
+        const openButton = document.getElementById('openButton');
+
+        if (doorDate) doorDate.classList.add('is-shown');
+        lines.forEach(l => l.classList.add('is-shown'));
+        if (openButton) openButton.classList.add('is-shown');
+    }
+
     /* -----------------------------------------------------------------
-       01 â€” THE DOOR / OPENING SCREEN
+       01 — THE DOOR / OPENING SCREEN
     ----------------------------------------------------------------- */
     function initOpening() {
         const door = document.getElementById('door');
         const doorDate = document.getElementById('doorDate');
         const doorName = document.getElementById('doorName');
         const openButton = document.getElementById('openButton');
-        const lines = document.querySelectorAll('.door__line');
         const siteNav = document.getElementById('siteNav');
 
         if (doorDate && CFG.birthdayDate) {
@@ -350,20 +397,7 @@ window.CONFIG = {
             doorName.textContent = CFG.girlfriendName;
         }
 
-        // Sequential line reveals — slower, more cinematic
-        const baseDelays = [1000, 3400, 6000, 8800];
-        lines.forEach((line, idx) => {
-            const delay = baseDelays[idx] || (idx * 2000 + 1000);
-            setTimeout(() => {
-                line.classList.add('is-shown');
-            }, delay);
-        });
-
         if (openButton) {
-            setTimeout(() => {
-                openButton.classList.add('is-shown');
-            }, 12000);
-
             openButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 document.body.classList.add('is-open');
@@ -380,14 +414,17 @@ window.CONFIG = {
                     if (story) {
                         story.scrollIntoView({ behavior: 'smooth' });
                     }
-                }, 400);
+                }, 300);
             });
         }
 
-        // Tap anywhere on opening door to also trigger audio immediately
+        // Tap anywhere on opening door to trigger audio or fast-forward text
         if (door) {
-            door.addEventListener('click', () => {
+            door.addEventListener('click', (e) => {
                 playAudio();
+                if (e.target && !e.target.closest('#openButton')) {
+                    fastForwardDoor();
+                }
             }, { passive: true });
         }
     }
@@ -861,6 +898,8 @@ window.CONFIG = {
         const caption = document.getElementById('robloxCaption');
         if (!CFG.roblox) return;
 
+        const robloxLightboxItems = [];
+
         if (missions && CFG.roblox.missions) {
             missions.innerHTML = '';
             CFG.roblox.missions.forEach((m) => {
@@ -869,13 +908,35 @@ window.CONFIG = {
                 card.innerHTML = `
                     <p class="mission__label">${m.label}</p>
                     <p class="mission__prompt">${m.prompt}</p>
-                    <div class="mission__image-wrap">
+                    <div class="mission__image-wrap" role="button" tabindex="0" aria-label="Lihat foto ${m.label}">
                         <img class="mission__image" src="${m.image}" alt="${m.prompt}" loading="lazy">
                     </div>
                     <p class="mission__status">${m.status}</p>
                 `;
                 const img = card.querySelector('img');
                 setupImageFallback(img, m.label);
+
+                const itemIdx = robloxLightboxItems.length;
+                robloxLightboxItems.push({
+                    image: m.image,
+                    caption: `${m.label}: ${m.prompt} (${m.status})`
+                });
+
+                const wrap = card.querySelector('.mission__image-wrap');
+                if (wrap) {
+                    wrap.addEventListener('click', () => {
+                        currentGalleryList = robloxLightboxItems;
+                        openLightbox(itemIdx);
+                    });
+                    wrap.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            currentGalleryList = robloxLightboxItems;
+                            openLightbox(itemIdx);
+                        }
+                    });
+                }
+
                 missions.appendChild(card);
             });
         }
@@ -935,12 +996,38 @@ window.CONFIG = {
             CFG.roblox.gallery.forEach((imgSrc, idx) => {
                 const item = document.createElement('div');
                 item.className = 'roblox-gallery__item reveal';
+                item.setAttribute('role', 'button');
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('aria-label', `Lihat kenangan Roblox ${idx + 1}`);
+
                 const img = document.createElement('img');
                 img.src = imgSrc;
                 img.alt = 'Roblox memory ' + (idx + 1);
                 img.loading = 'lazy';
                 setupImageFallback(img, 'Memory');
                 item.appendChild(img);
+
+                const itemIdx = robloxLightboxItems.length;
+                const capText = (CFG.roblox.captions && CFG.roblox.captions[idx % CFG.roblox.captions.length])
+                    ? `"${CFG.roblox.captions[idx % CFG.roblox.captions.length]}"`
+                    : `Roblox Memory ${idx + 1}`;
+                robloxLightboxItems.push({
+                    image: imgSrc,
+                    caption: capText
+                });
+
+                item.addEventListener('click', () => {
+                    currentGalleryList = robloxLightboxItems;
+                    openLightbox(itemIdx);
+                });
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        currentGalleryList = robloxLightboxItems;
+                        openLightbox(itemIdx);
+                    }
+                });
+
                 robloxGallery.appendChild(item);
             });
         }
@@ -1196,9 +1283,11 @@ window.CONFIG = {
                     document.body.classList.add('is-locked');
                     const musicPlayer = document.getElementById('musicPlayer');
                     const siteNav = document.getElementById('siteNav');
+                    const endingSection = document.getElementById('ending');
                     if (musicPlayer) musicPlayer.setAttribute('hidden', '');
                     if (siteNav) siteNav.setAttribute('hidden', '');
                     if (endingSection) endingSection.setAttribute('hidden', '');
+                    fastForwardDoor();
                 }, 500);
             });
         }
@@ -1266,7 +1355,6 @@ window.CONFIG = {
     ----------------------------------------------------------------- */
     function initPreEnter() {
         const pre = document.getElementById('preEnter');
-        const door = document.getElementById('door');
         const nameEl = document.getElementById('preEnterName');
         const forEl = document.getElementById('preEnterFor');
         if (!pre) return;
@@ -1274,30 +1362,20 @@ window.CONFIG = {
         // Set name dynamically
         if (nameEl && CFG.girlfriendName) nameEl.textContent = CFG.girlfriendName + '.';
 
-        // Hide door behind pre-enter initially (no blur-in class yet)
-        if (door) {
-            door.style.opacity = '0';
-            door.style.filter = 'blur(20px)';
-        }
-
         function enter() {
             // Immediately try to unlock audio
             playAudio();
 
-            // Blur + fade out pre-enter
+            // Blur + fade out pre-enter smoothly
             pre.classList.add('is-leaving');
 
-            // After transition finishes, hide pre-enter and reveal door
+            // Trigger the door text animation sequence right now as pre-enter dissolves
+            startDoorSequence();
+
+            // After transition finishes, hide pre-enter completely
             setTimeout(() => {
                 pre.setAttribute('hidden', '');
-
-                if (door) {
-                    // Start door intro (text animation begins)
-                    door.classList.add('blur-in');
-                    door.style.opacity = '';
-                    door.style.filter = '';
-                }
-            }, 1150);
+            }, 1100);
         }
 
         pre.addEventListener('click', enter);

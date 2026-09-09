@@ -94,7 +94,12 @@ body {
 
 body.is-locked {
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
+}
+
+body.is-locked main {
+    display: none !important;
 }
 
 img {
@@ -466,7 +471,7 @@ main {
 .door {
     position: fixed;
     inset: 0;
-    z-index: 300;
+    z-index: 700;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -526,8 +531,13 @@ body.is-open .door {
     color: var(--ivory-faint);
     margin-bottom: 2.25rem;
     opacity: 0;
-    animation: doorFadeIn var(--dur-slow) var(--ease-soft) forwards;
-    animation-delay: 0.2s;
+    transform: translateY(12px);
+    transition: opacity 1.2s var(--ease-soft), transform 1.2s var(--ease-soft);
+}
+
+.door__date.is-shown {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .door__lines {
@@ -542,11 +552,13 @@ body.is-open .door {
     color: var(--ivory-soft);
     margin: 0 0 0.85rem;
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(14px);
+    transition: opacity 1.3s var(--ease-soft), transform 1.3s var(--ease-soft);
 }
 
 .door__line.is-shown {
-    animation: doorFadeIn var(--dur-slow) var(--ease-soft) forwards;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .door__line--for {
@@ -567,17 +579,21 @@ body.is-open .door {
     color: var(--ivory);
     background: rgba(141, 54, 68, 0.12);
     opacity: 0;
-    transform: translateY(8px);
-    transition: border-color var(--dur-fast) ease,
+    transform: translateY(14px);
+    transition: opacity 1.2s var(--ease-soft),
+                transform 1.2s var(--ease-soft),
+                border-color var(--dur-fast) ease,
                 background var(--dur-fast) ease,
-                transform var(--dur-fast) ease,
                 box-shadow var(--dur-fast) ease;
     min-height: 48px;
     backdrop-filter: blur(6px);
+    pointer-events: none;
 }
 
 .door__button.is-shown {
-    animation: doorFadeIn var(--dur-slow) var(--ease-soft) forwards;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .door__button:hover,
@@ -1453,22 +1469,51 @@ body.is-open .door {
 }
 
 .mission__image-wrap {
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    aspect-ratio: 16 / 10;
-    background: var(--bg-card);
+    aspect-ratio: 16 / 9;
+    background: #0e0d0d;
     border: 1px solid var(--line);
+    cursor: pointer;
+    position: relative;
 }
 
 .mission__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform var(--dur-med) ease;
 }
 
 .mission:hover .mission__image {
     transform: scale(1.03);
+}
+
+.mission__image-wrap::after,
+.roblox-gallery__item::after {
+    content: "✦ tap to view";
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ivory-soft);
+    background: rgba(14, 13, 12, 0.75);
+    border: 1px solid rgba(196, 154, 168, 0.3);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
+    backdrop-filter: blur(4px);
+}
+
+.mission:hover .mission__image-wrap::after,
+.roblox-gallery__item:hover::after {
+    opacity: 1;
+    transform: translateY(-2px);
 }
 
 .mission__status {
@@ -1497,15 +1542,18 @@ body.is-open .door {
 .roblox-gallery__item {
     border-radius: 6px;
     overflow: hidden;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     border: 1px solid var(--line);
-    background: var(--bg);
+    background: #0e0d0d;
+    cursor: pointer;
+    position: relative;
 }
 
 .roblox-gallery__item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform var(--dur-med) ease, opacity var(--dur-med) ease;
 }
 
@@ -2319,14 +2367,27 @@ body.is-open .door {
 }
 
 @media (max-width: 39.99rem) {
+    .chapter--roblox {
+        padding: 2.2rem 1rem !important;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .chapter--roblox .chapter__intro {
+        margin-bottom: 1.75rem;
+    }
+
     .missions {
         display: flex;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        gap: 1rem;
-        padding-bottom: 0.5rem;
+        gap: 0.85rem;
+        padding-bottom: 0.75rem;
         -ms-overflow-style: none;
         scrollbar-width: none;
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
     }
 
     .missions::-webkit-scrollbar {
@@ -2334,9 +2395,40 @@ body.is-open .door {
     }
 
     .mission {
-        min-width: 80vw;
-        scroll-snap-align: start;
+        min-width: 78vw;
+        max-width: 310px;
+        scroll-snap-align: center;
         flex-shrink: 0;
+        padding: 0.95rem 0.95rem 1.15rem;
+    }
+
+    .mission__prompt {
+        font-size: 1.05rem;
+        margin-bottom: 0.65rem;
+    }
+
+    .mission__image-wrap::after,
+    .roblox-gallery__item::after {
+        opacity: 0.85; /* Always visible on mobile as a clear hint to tap */
+    }
+
+    .roblox-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+
+    .roblox-stats {
+        grid-template-columns: repeat(2, 1fr);
+        margin-top: 2rem;
+    }
+
+    .roblox-stat:last-child {
+        grid-column: span 2;
+    }
+
+    .roblox-caption {
+        font-size: 1.15rem;
+        margin-top: 1.25rem;
     }
 }
 
