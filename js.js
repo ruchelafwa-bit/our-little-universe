@@ -18,9 +18,9 @@ window.CONFIG = {
 
     // Musik
     music: {
-        title: "Stuck with U",
-        artist: "Ariana Grande & Justin Bieber",
-        file: "assets/music/stuck_with_u.mp3"
+        title: "Shape Of My Heart",
+        artist: "Backstreet Boys",
+        file: "assets/music/shape_of_my_heart.mp3"
     },
 
     // Pesan rahasia saat logo bintang di nav diklik 5 kali
